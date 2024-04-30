@@ -9,7 +9,7 @@ const csvFileText = dirFiles
   .filter((file) => file.includes(".txt"))
   .map((file) => file.replace(".txt", ""))
   .join(", ");
-console.log("csv file text:", csvFileText);
+console.log("csv file text :", csvFileText);
 
 await fs.promises.writeFile(CSV_FILE_NAME, csvFileText);
 
