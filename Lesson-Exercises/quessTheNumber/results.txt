@@ -1,4 +1,0 @@
-5/10/2024, 1:53:33 AM: Congratulations! You managed to guess the number. Attempts: 2
-5/10/2024, 1:53:49 AM: Congratulations! You managed to guess the number. Attempts: 2
-5/10/2024, 1:54:21 AM: Congratulations! You managed to guess the number. Attempts: 8
-5/10/2024, 8:00:41 PM: Congratulations! You managed to guess the number. Attempts: 5
