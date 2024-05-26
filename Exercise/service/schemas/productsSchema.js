@@ -23,8 +23,23 @@ const schema = new Schema(
       type: Boolean,
       default: false,
     },
-  }
-  // ,{ collection: "products" }
+    // email: {
+    //   type: String,
+    //   match: [
+    //     /^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+    //     "enter a valid email address",
+    //   ],
+    //   required: [true, "=> this field is required"],
+    // },
+    // phone: {
+    //   type: String,
+    //   minLength: [10, "phone number should have 10 digits"],
+    //   maxLength: [10, "phone number should have 10 digits"],
+    //   match: [/\d{10}/, "phone number should only have digits"],
+    //   required: [true, "=> this field is required"],
+    // },
+  },
+  { versionKey: false } // collection: products => poate fi adaugata in obiectul din stanga
 );
 
 const Product = model("product", schema);
