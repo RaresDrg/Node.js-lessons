@@ -4,6 +4,14 @@ function getAllProductsFromDB() {
   return Product.find();
 }
 
+function getProductsPaginated(skip, limit) {
+  return Product.find().skip(skip).limit(limit);
+}
+
+function getFilteredProductsFromDB(favoriteFilter) {
+  return Product.find({ favorite: favoriteFilter });
+}
+
 function getSpecificProductFromDb(productId) {
   return Product.findById(productId);
 }
@@ -24,8 +32,8 @@ function removeProductFromDB(productId) {
   return Product.findByIdAndDelete(productId);
 }
 
-function updateProductFromDB(productId, update) {
-  return Product.findByIdAndUpdate(productId, update, {
+function updateProductFromDB(productId, updates) {
+  return Product.findByIdAndUpdate(productId, updates, {
     new: true,
     runValidators: true,
   });
@@ -41,6 +49,8 @@ function updateStatusProductFromDB(productId, statusUpdate) {
 
 const productsService = {
   getAllProductsFromDB,
+  getProductsPaginated,
+  getFilteredProductsFromDB,
   getSpecificProductFromDb,
   addProductToDB,
   removeProductFromDB,

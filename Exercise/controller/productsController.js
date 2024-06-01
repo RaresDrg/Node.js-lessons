@@ -1,15 +1,27 @@
 import productsService from "../service/productsService.js";
+import utils from "../utils/utils.js";
 
 async function listProducts(req, res, next) {
   try {
-    const result = await productsService.getAllProductsFromDB();
+    const { page, limit, favorite } = req.query;
 
-    if (!result) {
+    let productsList;
+
+    if (favorite === "true" || favorite === "false") {
+      productsList = await productsService.getFilteredProductsFromDB(favorite);
+    } else if (Number(page) && Number(limit)) {
+      const skip = (page - 1) * limit;
+      productsList = await productsService.getProductsPaginated(skip, limit);
+    } else {
+      productsList = await productsService.getAllProductsFromDB();
+    }
+
+    if (!productsList || productsList.length === 0) {
       res.json({ status: "success", code: 200, message: "No data", data: [] });
       return;
     }
 
-    res.status(200).json({ status: "success", code: 200, data: result });
+    res.status(200).json({ status: "success", code: 200, data: productsList });
   } catch (error) {
     next(error);
   }
@@ -28,9 +40,7 @@ async function getProductById(req, res, next) {
     res.status(200).json({ status: "succes", code: 200, data: result });
   } catch (error) {
     if (error.name === "CastError") {
-      res
-        .status(400)
-        .json({ status: "error", code: 400, message: "invalid id value" });
+      utils.handleInvalidIdError(res);
       return;
     }
 
@@ -47,7 +57,7 @@ async function addProduct(req, res, next) {
       res.status(400).json({
         status: "failed",
         code: 400,
-        message: "product already exists in db",
+        message: "the product you want to add, it already exists in db",
       });
       return;
     }
@@ -60,9 +70,7 @@ async function addProduct(req, res, next) {
     });
   } catch (error) {
     if (error.name === "ValidationError") {
-      res
-        .status(400)
-        .json({ status: "failed", code: 400, message: error.message });
+      utils.handleValidationError(res, error.message);
       return;
     }
 
@@ -83,13 +91,11 @@ async function removeProduct(req, res, next) {
     res.status(200).json({
       status: "succes",
       code: 200,
-      message: `product: ${result.name}, removed from db`,
+      message: `Product: ${result.name}, removed from db`,
     });
   } catch (error) {
     if (error.name === "CastError") {
-      res
-        .status(400)
-        .json({ status: "error", code: 400, message: "invalid id value" });
+      utils.handleInvalidIdError(res);
       return;
     }
 
@@ -99,9 +105,21 @@ async function removeProduct(req, res, next) {
 
 async function updateProduct(req, res, next) {
   try {
+    const { name, size, type } = req.body;
+    const hasValidFields = name || size || type;
+
+    if (!hasValidFields) {
+      res.status(400).json({
+        status: "failed",
+        code: 400,
+        message:
+          "In order to update the product, you must enter values for at least one of these fields: name, size or type",
+      });
+      return;
+    }
+
     const { productId } = req.params;
     const update = { ...req.body };
-
     const result = await productsService.updateProductFromDB(productId, update);
 
     if (!result) {
@@ -117,16 +135,12 @@ async function updateProduct(req, res, next) {
     });
   } catch (error) {
     if (error.name === "CastError") {
-      res
-        .status(400)
-        .json({ status: "error", code: 400, message: "invalid id value" });
+      utils.handleInvalidIdError(res);
       return;
     }
 
     if (error.name === "ValidationError") {
-      res
-        .status(400)
-        .json({ status: "error", code: 400, message: error.message });
+      utils.handleValidationError(res, error.message);
       return;
     }
 
@@ -136,12 +150,8 @@ async function updateProduct(req, res, next) {
 
 async function updateProductStatus(req, res, next) {
   try {
-    const { productId } = req.params;
-    const { favorite: statusUpdate } = req.body;
-
-    const statusIsValid =
-      statusUpdate !== undefined &&
-      (statusUpdate === true || statusUpdate === false);
+    const { favorite } = req.body;
+    const statusIsValid = favorite === true || favorite === false;
 
     if (!statusIsValid) {
       res.status(400).json({
@@ -154,8 +164,8 @@ async function updateProductStatus(req, res, next) {
     }
 
     const result = await productsService.updateStatusProductFromDB(
-      productId,
-      statusUpdate
+      req.params.productId,
+      favorite
     );
 
     if (!result) {
@@ -166,14 +176,12 @@ async function updateProductStatus(req, res, next) {
     res.status(200).json({
       status: "succes",
       code: 200,
-      message: "product's status updated",
+      message: "Product's status updated",
       data: result,
     });
   } catch (error) {
     if (error.name === "CastError") {
-      res
-        .status(400)
-        .json({ status: "error", code: 400, message: "invalid id value" });
+      utils.handleInvalidIdError(res);
       return;
     }
 
