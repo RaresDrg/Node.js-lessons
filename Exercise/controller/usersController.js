@@ -117,7 +117,7 @@ async function updateUserSubscription(req, res, next) {
       return;
     }
 
-    const updatedUser = await usersService.updateUser(userId, subscription);
+    const updatedUser = await usersService.updateUser(userId, { subscription });
 
     res.status(200).json({
       status: "succes",
