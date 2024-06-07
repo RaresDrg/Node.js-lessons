@@ -1,15 +1,15 @@
 import Product from "./schemas/productsSchema.js";
 
-function getAllProductsFromDB() {
-  return Product.find();
+function getAllProductsFromDB(owner) {
+  return Product.find({ owner });
 }
 
-function getProductsPaginated(skip, limit) {
-  return Product.find().skip(skip).limit(limit);
+function getProductsPaginated(owner, skip, limit) {
+  return Product.find({ owner }).skip(skip).limit(limit);
 }
 
-function getFilteredProductsFromDB(favoriteFilter) {
-  return Product.find({ favorite: favoriteFilter });
+function getFilteredProductsFromDB(owner, favoriteFilter) {
+  return Product.find({ owner, favorite: favoriteFilter });
 }
 
 function getSpecificProductFromDb(productId) {
@@ -32,19 +32,11 @@ function removeProductFromDB(productId) {
   return Product.findByIdAndDelete(productId);
 }
 
-function updateProductFromDB(productId, updates) {
+function updateProductInDB(productId, updates) {
   return Product.findByIdAndUpdate(productId, updates, {
     new: true,
     runValidators: true,
   });
-}
-
-function updateStatusProductFromDB(productId, statusUpdate) {
-  return Product.findByIdAndUpdate(
-    productId,
-    { favorite: statusUpdate },
-    { new: true, runValidators: true }
-  );
 }
 
 const productsService = {
@@ -54,8 +46,7 @@ const productsService = {
   getSpecificProductFromDb,
   addProductToDB,
   removeProductFromDB,
-  updateProductFromDB,
-  updateStatusProductFromDB,
+  updateProductInDB,
 };
 
 export default productsService;

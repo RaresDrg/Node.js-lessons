@@ -3,17 +3,25 @@ import utils from "../utils/utils.js";
 
 async function listProducts(req, res, next) {
   try {
+    const owner = req.user.id;
     const { page, limit, favorite } = req.query;
 
     let productsList;
 
     if (favorite === "true" || favorite === "false") {
-      productsList = await productsService.getFilteredProductsFromDB(favorite);
+      productsList = await productsService.getFilteredProductsFromDB(
+        owner,
+        favorite
+      );
     } else if (Number(page) && Number(limit)) {
       const skip = (page - 1) * limit;
-      productsList = await productsService.getProductsPaginated(skip, limit);
+      productsList = await productsService.getProductsPaginated(
+        owner,
+        skip,
+        limit
+      );
     } else {
-      productsList = await productsService.getAllProductsFromDB();
+      productsList = await productsService.getAllProductsFromDB(owner);
     }
 
     if (!productsList || productsList.length === 0) {
@@ -50,7 +58,10 @@ async function getProductById(req, res, next) {
 
 async function addProduct(req, res, next) {
   try {
-    const newProduct = { ...req.body };
+    const owner = req.user.id;
+    const { name, size, type } = req.body;
+
+    const newProduct = { name, size, type, owner };
     const result = await productsService.addProductToDB(newProduct);
 
     if (result === "product already exists") {
@@ -119,8 +130,8 @@ async function updateProduct(req, res, next) {
     }
 
     const { productId } = req.params;
-    const update = { ...req.body };
-    const result = await productsService.updateProductFromDB(productId, update);
+    const updates = { ...req.body };
+    const result = await productsService.updateProductInDB(productId, updates);
 
     if (!result) {
       res.status(404).json({ code: 404, message: "Not found" });
@@ -163,9 +174,9 @@ async function updateProductStatus(req, res, next) {
       return;
     }
 
-    const result = await productsService.updateStatusProductFromDB(
+    const result = await productsService.updateProductInDB(
       req.params.productId,
-      favorite
+      { favorite }
     );
 
     if (!result) {

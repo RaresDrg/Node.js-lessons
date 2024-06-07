@@ -37,6 +37,17 @@ async function signup(req, res, next) {
 
 async function login(req, res, next) {
   try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({
+        status: "failed",
+        code: 400,
+        message: "Missing fields. You must enter: email and password !",
+      });
+      return;
+    }
+
     const result = await usersService.checkUserInDB({ ...req.body });
 
     if (result === "email is wrong" || result === "password is wrong") {
@@ -63,11 +74,6 @@ async function login(req, res, next) {
       },
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      utils.handleValidationError(res, error.message);
-      return;
-    }
-
     next(error);
   }
 }
