@@ -157,7 +157,7 @@ async function updateUserAvatar(req, res, next) {
 
     const fileExtension = req.file.mimetype.split("/")[1];
     const fileUniqueName = `${userId}.${fileExtension}`;
-    // const fileExtension = path.extname(file.originalName);
+    // const fileExtension = path.extname(req.file.originalName);
     // const fileUniqueName = `${userId}${fileExtension}`;
     const filePath = path.join(process.cwd(), "public/avatars", fileUniqueName);
 
