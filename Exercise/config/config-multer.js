@@ -5,6 +5,12 @@ import path from "path";
 const temporaryDir = path.join(process.cwd(), "tmp");
 checkFolder(temporaryDir);
 
+const stableDir = path.join(process.cwd(), "public");
+checkFolder(stableDir);
+
+const avatarsDir = path.join(stableDir, "avatars");
+checkFolder(avatarsDir);
+
 async function checkFolder(folderPath) {
   try {
     await fs.access(folderPath);
