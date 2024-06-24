@@ -15,7 +15,7 @@ io.on("connection", (socket) => {
   socket.on("chat message", (data) => {
     console.log("Am primit mesaj:");
     console.log(data);
-    io.emit("chat message", data);
+    socket.emit("chat message", data);
   });
 
   socket.on("disconnect", () => {
